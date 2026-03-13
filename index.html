@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 Ecossistema Digital 3D - Almas de Pombagira</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2f 100%);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Partículas de fundo */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header com efeito glassmorphism */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3em;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ffd700, #ff6b6b, #9b59b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #ccc;
+            letter-spacing: 2px;
+        }
+
+        .header .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #ffd700;
+        }
+
+        /* Grid principal */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Container 3D */
+        .chart-container {
+            position: relative;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+        }
+
+        #pieChart {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Painel de redes sociais */
+        .social-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 25px;
+            height: 500px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ffd700 #1a1a2f;
+        }
+
+        .social-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .social-panel::-webkit-scrollbar-track {
+            background: #1a1a2f;
+        }
+
+        .social-panel::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 4px;
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5em;
+            color: #ffd700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .social-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .social-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .social-item:hover::before {
+            left: 100%;
+        }
+
+        .social-item:hover {
+            transform: translateX(10px);
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .social-item.active {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin-right: 15px;
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
+            color: #000;
+            position: relative;
+        }
+
+        /* Ícones personalizados para plataformas sem suporte oficial */
+        .icon-bluesky::before {
+            content: "🦋";
+            font-size: 1.2em;
+        }
+
+        .icon-x::before {
+            content: "𝕏";
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .icon-threads::before {
+            content: "⨯";
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .icon-kwai::before {
+            content: "Ⓚ";
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .social-info {
+            flex: 1;
+        }
+
+        .social-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: #fff;
+        }
+
+        .social-platform {
+            font-size: 0.85em;
+            color: #ffd700;
+            opacity: 0.8;
+        }
+
+        .social-percentage {
+            font-weight: 700;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            transition: width 0.3s ease;
+        }
+
+        /* Cards das páginas oficiais */
+        .official-pages {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .official-card {
+            background: rgba(255, 215, 0, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .official-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .official-card:hover::after {
+            opacity: 1;
+        }
+
+        .official-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: #ffd700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .official-card i {
+            font-size: 2.5em;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .official-card h3 {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .official-card p {
+            font-size: 0.85em;
+            color: #ccc;
+        }
+
+        /* Tooltip personalizado */
+        .custom-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff;
+            font-size: 0.9em;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Efeitos de glow */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Animações */
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0.5; transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .official-pages {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .official-pages {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Three.js para gráfico 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <!-- Canvas para partículas -->
+    <canvas id="particles"></canvas>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🌙 ALMAS DE POMBAGIRA 🌙</h1>
+            <p>Ecossistema Digital • 28 Plataformas • Presença Global</p>
+            <div class="stats">
+                <span><i class="fas fa-globe"></i> 28 Redes</span>
+                <span><i class="fas fa-users"></i> +100K Seguidores</span>
+                <span><i class="fas fa-chart-line"></i> 3 Continentes</span>
+            </div>
+        </div>
+        
+        <!-- Grid principal com gráfico e lista -->
+        <div class="main-grid">
+            <!-- Gráfico 3D -->
+            <div class="chart-container">
+                <div id="pieChart"></div>
+            </div>
+            
+            <!-- Painel de redes -->
+            <div class="social-panel">
+                <div class="panel-title">
+                    <i class="fas fa-share-alt"></i>
+                    <span>REDES SOCIAIS • 28 ATIVAS</span>
+                </div>
+                <div class="social-list" id="socialList"></div>
+            </div>
+        </div>
+        
+        <!-- Páginas Oficiais -->
+        <div class="official-pages">
+            <a href="https://bio.site/AlmasdePombagira" target="_blank" class="official-card">
+                <i class="fas fa-link"></i>
+                <h3>Bio Site</h3>
+                <p>@AlmasdePombagira</p>
+            </a>
+            
+            <a href="https://linktr.ee/alexiarosadefogo" target="_blank" class="official-card">
+                <i class="fas fa-tree"></i>
+                <h3>Linktree</h3>
+                <p>@alexiarosadefogo</p>
+            </a>
+            
+            <a href="https://pombagiras.my.canva.site/" target="_blank" class="official-card">
+                <i class="fas fa-paint-brush"></i>
+                <h3>Canva Site</h3>
+                <p>Pombagiras</p>
+            </a>
+            
+            <a href="https://github.com/pombagiras" target="_blank" class="official-card">
+                <i class="fab fa-github"></i>
+                <h3>GitHub</h3>
+                <p>@pombagiras</p>
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // Lista completa de redes sociais com ícones corrigidos
+        const socialNetworks = [
+            { name: 'TikTok - @alexia.melusine', platform: 'TikTok', icon: 'fab fa-tiktok', url: 'https://www.tiktok.com/@alexia.melusine', category: 'Video', percentage: 5.2 },
+            { name: 'TikTok - @espelhosdepombagira', platform: 'TikTok', icon: 'fab fa-tiktok', url: 'https://www.tiktok.com/@espelhosdepombagira', category: 'Video', percentage: 4.8 },
+            { name: 'TikTok - @almasdepombagira', platform: 'TikTok', icon: 'fab fa-tiktok', url: 'https://www.tiktok.com/@almasdepombagira', category: 'Video', percentage: 5.5 },
+            { name: 'TikTok - @alexiarosadefogo', platform: 'TikTok', icon: 'fab fa-tiktok', url: 'https://www.tiktok.com/@alexiarosadefogo', category: 'Video', percentage: 4.5 },
+            { name: 'YouTube - Almas de Pombagira', platform: 'YouTube', icon: 'fab fa-youtube', url: 'https://www.youtube.com/@almasdepombagira', category: 'Video', percentage: 6.0 },
+            { name: 'Instagram - @almasdepombagira', platform: 'Instagram', icon: 'fab fa-instagram', url: 'https://www.instagram.com/almasdepombagira/', category: 'Social', percentage: 5.0 },
+            { name: 'Instagram - @alexiamelusine', platform: 'Instagram', icon: 'fab fa-instagram', url: 'https://www.instagram.com/alexiamelusine/', category: 'Social', percentage: 4.2 },
+            { name: 'Threads - @almasdepombagira', platform: 'Threads', icon: 'custom-threads', url: 'https://www.threads.com/@almasdepombagira', category: 'Social', percentage: 3.0 },
+            { name: 'Threads - @alexiamelusine', platform: 'Threads', icon: 'custom-threads', url: 'https://www.threads.com/@alexiamelusine', category: 'Social', percentage: 2.8 },
+            { name: 'Facebook - Alexia Tsan', platform: 'Facebook', icon: 'fab fa-facebook', url: 'https://www.facebook.com/alexia.tsan.7', category: 'Social', percentage: 3.5 },
+            { name: 'Bluesky - @almasdepombagira', platform: 'Bluesky', icon: 'custom-bluesky', url: 'https://bsky.app/profile/almasdepombagira.bsky.social', category: 'Social', percentage: 2.5 },
+            { name: 'Meta AI - @alexiamelusine', platform: 'Meta AI', icon: 'fas fa-robot', url: 'https://www.meta.ai/@alexiamelusine', category: 'AI', percentage: 2.0 },
+            { name: 'Sora - Alexia Luz de Ferro', platform: 'Sora', icon: 'fas fa-video', url: 'https://sora.chatgpt.com/profile/alexialuzdeferro', category: 'AI', percentage: 1.8 },
+            { name: 'Telegram - Pomba Giras', platform: 'Telegram', icon: 'fab fa-telegram', url: 'https://t.me/pomba_giras', category: 'Messaging', percentage: 3.2 },
+            { name: 'WhatsApp Channel', platform: 'WhatsApp', icon: 'fab fa-whatsapp', url: 'https://whatsapp.com/channel/0029VbBs2AnJkK7J9J0nLr2G', category: 'Messaging', percentage: 2.5 },
+            { name: 'Discord Server', platform: 'Discord', icon: 'fab fa-discord', url: 'https://discord.gg/gWZP8R7Dqu', category: 'Community', percentage: 4.0 },
+            { name: 'Pinterest - @almasdepombagira', platform: 'Pinterest', icon: 'fab fa-pinterest', url: 'https://br.pinterest.com/almasdepombagira/', category: 'Visual', percentage: 3.8 },
+            { name: 'Kwai - @AlmasdePombagira', platform: 'Kwai', icon: 'custom-kwai', url: 'https://www.kwai.com/@AlmasdePombagira', category: 'Video', percentage: 3.0 },
+            { name: 'Kwai - @AlexiaRosadeFogo', platform: 'Kwai', icon: 'custom-kwai', url: 'https://www.kwai.com/@AlexiaRosadeFogo', category: 'Video', percentage: 2.8 },
+            { name: 'Kwai - @espelhosdepombagira', platform: 'Kwai', icon: 'custom-kwai', url: 'https://www.kwai.com/@espelhosdepombagira', category: 'Video', percentage: 2.7 },
+            { name: 'Reddit - u/Alexia-Luz-de-Ferro', platform: 'Reddit', icon: 'fab fa-reddit', url: 'https://www.reddit.com/user/Alexia-Luz-de-Ferro/', category: 'Forum', percentage: 3.5 },
+            { name: 'X - @PambuNjila', platform: 'X', icon: 'custom-x', url: 'https://x.com/PambuNjila', category: 'Social', percentage: 4.5 },
+            { name: 'Substack - @alexiamelusine', platform: 'Substack', icon: 'fas fa-newspaper', url: 'https://substack.com/@alexiamelusine', category: 'Blog', percentage: 2.5 },
+            { name: 'Medium - @alexiamelusine', platform: 'Medium', icon: 'fab fa-medium', url: 'https://medium.com/@alexiamelusine', category: 'Blog', percentage: 2.3 },
+            { name: 'Mastodon - @alexiamelusine', platform: 'Mastodon', icon: 'fab fa-mastodon', url: 'https://mastodon.social/@alexiamelusine', category: 'Social', percentage: 2.0 },
+            { name: 'Snapchat - @alexiamelusine', platform: 'Snapchat', icon: 'fab fa-snapchat', url: 'https://www.snapchat.com/@alexiamelusine', category: 'Social', percentage: 2.5 },
+            { name: 'Tumblr - @alexiamelusine', platform: 'Tumblr', icon: 'fab fa-tumblr', url: 'https://www.tumblr.com/alexiamelusine', category: 'Blog', percentage: 2.2 },
+            { name: 'Spotify - Podcast 1', platform: 'Spotify', icon: 'fab fa-spotify', url: 'https://open.spotify.com/show/0oeCL1QScD3v7dHeUvJjgJ', category: 'Audio', percentage: 3.5 },
+            { name: 'Spotify - Podcast 2', platform: 'Spotify', icon: 'fab fa-spotify', url: 'https://open.spotify.com/show/6ahRd7QT2wcq7ldt5CJHZW', category: 'Audio', percentage: 3.3 }
+        ];
+
+        // Função para criar o gráfico 3D
+        function create3DPieChart() {
+            const container = document.getElementById('pieChart');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            
+            // Cena, câmera, renderizador
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0f);
+            
+            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(5, 3, 8);
+            camera.lookAt(0, 0, 0);
+            
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.innerHTML = '';
+            container.appendChild(renderer.domElement);
+            
+            // Controles
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 2.0;
+            controls.enableZoom = true;
+            controls.enablePan = false;
+            controls.maxPolarAngle = Math.PI / 2;
+            
+            // Luzes
+            const ambientLight = new THREE.AmbientLight(0x404060);
+            scene.add(ambientLight);
+            
+            const light1 = new THREE.PointLight(0xffaa00, 1, 20);
+            light1.position.set(2, 3, 4);
+            scene.add(light1);
+            
+            const light2 = new THREE.PointLight(0x0066ff, 0.8, 20);
+            light2.position.set(-3, 2, -2);
+            scene.add(light2);
+            
+            const light3 = new THREE.DirectionalLight(0xffffff, 0.5);
+            light3.position.set(1, 2, 1);
+            scene.add(light3);
+            
+            // Efeito de glow (luz ambiente forte)
+            const glowLight = new THREE.PointLight(0xffd700, 0.5, 15);
+            glowLight.position.set(0, 0, 0);
+            scene.add(glowLight);
+            
+            // Estrelas de fundo
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsCount = 1000;
+            const starsPositions = new Float32Array(starsCount * 3);
+            for (let i = 0; i < starsCount * 3; i += 3) {
+                starsPositions[i] = (Math.random() - 0.5) * 200;
+                starsPositions[i+1] = (Math.random() - 0.5) * 200;
+                starsPositions[i+2] = (Math.random() - 0.5) * 200;
+            }
+            starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
+            const starsMaterial = new THREE.PointsMaterial({color: 0xffffff, size: 0.1});
+            const stars = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(stars);
+            
+            // Agrupar por categoria para o gráfico
+            const categories = {};
+            socialNetworks.forEach(network => {
+                if (!categories[network.category]) {
+                    categories[network.category] = {
+                        total: 0,
+                        networks: [],
+                        color: getColorForCategory(network.category)
+                    };
+                }
+                categories[network.category].total += network.percentage;
+                categories[network.category].networks.push(network);
+            });
+            
+            // Converter para array e ordenar
+            const categoryArray = Object.entries(categories).map(([name, data]) => ({
+                name,
+                value: data.total,
+                color: data.color,
+                networks: data.networks
+            }));
+            
+            // Criar fatias 3D
+            const radius = 2.5;
+            const height3d = 0.4;
+            const segments = 64;
+            
+            let startAngle = 0;
+            
+            categoryArray.forEach((category, index) => {
+                const angle = (category.value / 100) * Math.PI * 2;
+                
+                // Criar a fatia 3D (um cilindro segmentado)
+                const shape = new THREE.Shape();
+                
+                // Pontos para a fatia
+                const points = [];
+                points.push(new THREE.Vector2(0, 0));
+                
+                const steps = 20;
+                for (let i = 0; i <= steps; i++) {
+                    const theta = startAngle + (angle * i / steps);
+                    const x = Math.cos(theta) * radius;
+                    const y = Math.sin(theta) * radius;
+                    points.push(new THREE.Vector2(x, y));
+                }
+                
+                shape.setFromPoints(points);
+                
+                const geometry = new THREE.ExtrudeGeometry(shape, {
+                    depth: height3d,
+                    bevelEnabled: true,
+                    bevelSegments: 2,
+                    bevelSize: 0.05,
+                    bevelThickness: 0.05
+                });
+                
+                // Centralizar a geometria
+                geometry.center();
+                
+                // Cor com variação baseada no índice
+                const color = new THREE.Color(category.color);
+                
+                const material = new THREE.MeshPhongMaterial({
+                    color: color,
+                    emissive: new THREE.Color(category.color).multiplyScalar(0.3),
+                    shininess: 60,
+                    transparent: true,
+                    opacity: 0.9,
+                    side: THREE.DoubleSide
+                });
+                
+                const slice = new THREE.Mesh(geometry, material);
+                slice.castShadow = true;
+                slice.receiveShadow = true;
+                slice.position.y = 0;
+                
+                // Adicionar bordas brilhantes
+                const edges = new THREE.EdgesGeometry(geometry);
+                const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffd700 }));
+                slice.add(line);
+                
+                scene.add(slice);
+                
+                // Adicionar texto 3D (usando um pequeno cubo como marcador)
+                const textPosX = Math.cos(startAngle + angle/2) * (radius * 0.7);
+                const textPosZ = Math.sin(startAngle + angle/2) * (radius * 0.7);
+                
+                const markerGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+                const markerMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0x442200 });
+                const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+                marker.position.set(textPosX, height3d/2, textPosZ);
+                scene.add(marker);
+                
+                startAngle += angle;
+            });
+            
+            // Adicionar anel central
+            const ringGeometry = new THREE.TorusGeometry(radius * 0.3, 0.05, 16, 100);
+            const ringMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0x332200 });
+            const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+            ring.rotation.x = Math.PI / 2;
+            ring.position.y = height3d/2;
+            scene.add(ring);
+            
+            // Adicionar esfera central
+            const coreGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+            const coreMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xffaa00, 
+                emissive: 0x442200,
+                shininess: 100
+            });
+            const core = new THREE.Mesh(coreGeometry, coreMaterial);
+            core.position.y = height3d/2;
+            scene.add(core);
+            
+            // Anéis flutuantes
+            const ring2Geometry = new THREE.TorusGeometry(radius * 1.2, 0.02, 16, 100);
+            const ring2Material = new THREE.MeshStandardMaterial({ color: 0xffaa00, emissive: 0x221100, transparent: true, opacity: 0.3 });
+            const ring2 = new THREE.Mesh(ring2Geometry, ring2Material);
+            ring2.rotation.x = Math.PI / 2;
+            ring2.rotation.z = 0.3;
+            ring2.position.y = height3d/2 + 0.2;
+            scene.add(ring2);
+            
+            const ring3Geometry = new THREE.TorusGeometry(radius * 1.5, 0.02, 16, 100);
+            const ring3Material = new THREE.MeshStandardMaterial({ color: 0x0066ff, emissive: 0x001122, transparent: true, opacity: 0.2 });
+            const ring3 = new THREE.Mesh(ring3Geometry, ring3Material);
+            ring3.rotation.x = Math.PI / 2;
+            ring3.rotation.z = -0.2;
+            ring3.position.y = height3d/2 - 0.1;
+            scene.add(ring3);
+            
+            // Pequenas partículas ao redor
+            const particleCount = 200;
+            const particleGeo = new THREE.BufferGeometry();
+            const particlePositions = new Float32Array(particleCount * 3);
+            const particleColors = new Float32Array(particleCount * 3);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const r = radius * 1.8 + Math.random() * 0.5;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = (Math.random() - 0.5) * 0.5;
+                
+                particlePositions[i*3] = Math.cos(theta) * r;
+                particlePositions[i*3+1] = phi * 2 + height3d/2;
+                particlePositions[i*3+2] = Math.sin(theta) * r;
+                
+                const color = new THREE.Color().setHSL(Math.random() * 0.1 + 0.1, 1, 0.5);
+                particleColors[i*3] = color.r;
+                particleColors[i*3+1] = color.g;
+                particleColors[i*3+2] = color.b;
+            }
+            
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+            particleGeo.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+            
+            const particleMat = new THREE.PointsMaterial({ 
+                size: 0.05, 
+                vertexColors: true,
+                transparent: true,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particles = new THREE.Points(particleGeo, particleMat);
+            scene.add(particles);
+            
+            // Animação
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                controls.update();
+                
+                // Rotacionar estrelas lentamente
+                stars.rotation.y += 0.0001;
+                
+                // Rotacionar partículas
+                particles.rotation.y += 0.001;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Ajustar ao redimensionar
+            window.addEventListener('resize', onWindowResize, false);
+            
+            function onWindowResize() {
+                const newWidth = container.clientWidth;
+                const newHeight = container.clientHeight;
+                
+                camera.aspect = newWidth / newHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(newWidth, newHeight);
+            }
+        }
+        
+        // Função auxiliar para cores por categoria
+        function getColorForCategory(category) {
+            const colors = {
+                'Video': '#ff6b6b',
+                'Social': '#4ecdc4',
+                'AI': '#9b59b6',
+                'Messaging': '#3498db',
+                'Community': '#e67e22',
+                'Visual': '#f1c40f',
+                'Forum': '#1abc9c',
+                'Blog': '#e84342',
+                'Audio': '#00cec9'
+            };
+            return colors[category] || '#ffd700';
+        }
+        
+        // Função para preencher a lista de redes sociais com ícones personalizados
+        function populateSocialList() {
+            const list = document.getElementById('socialList');
+            
+            socialNetworks.sort((a, b) => b.percentage - a.percentage);
+            
+            socialNetworks.forEach((network, index) => {
+                const item = document.createElement('div');
+                item.className = 'social-item';
+                item.setAttribute('data-url', network.url);
+                item.setAttribute('data-index', index);
+                
+                const icon = document.createElement('div');
+                icon.className = 'social-icon';
+                
+                // Ícones personalizados para plataformas específicas
+                if (network.icon === 'custom-bluesky') {
+                    icon.innerHTML = '<span class="icon-bluesky"></span>';
+                } else if (network.icon === 'custom-x') {
+                    icon.innerHTML = '<span class="icon-x"></span>';
+                } else if (network.icon === 'custom-threads') {
+                    icon.innerHTML = '<span class="icon-threads"></span>';
+                } else if (network.icon === 'custom-kwai') {
+                    icon.innerHTML = '<span class="icon-kwai"></span>';
+                } else {
+                    icon.innerHTML = `<i class="${network.icon}"></i>`;
+                }
+                
+                const info = document.createElement('div');
+                info.className = 'social-info';
+                
+                const name = document.createElement('div');
+                name.className = 'social-name';
+                name.textContent = network.name;
+                
+                const platform = document.createElement('div');
+                platform.className = 'social-platform';
+                platform.textContent = network.platform;
+                
+                info.appendChild(name);
+                info.appendChild(platform);
+                
+                const percentage = document.createElement('div');
+                percentage.className = 'social-percentage';
+                percentage.textContent = network.percentage + '%';
+                
+                const progress = document.createElement('div');
+                progress.className = 'progress-bar';
+                progress.style.width = network.percentage * 3 + 'px';
+                
+                item.appendChild(icon);
+                item.appendChild(info);
+                item.appendChild(percentage);
+                item.appendChild(progress);
+                
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.open(network.url, '_blank');
+                    
+                    // Efeito de destaque
+                    document.querySelectorAll('.social-item').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+                
+                list.appendChild(item);
+            });
+        }
+        
+        // Sistema de partículas de fundo
+        function initParticles() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const particleCount = 100;
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1,
+                    speedX: (Math.random() - 0.5) * 0.5,
+                    speedY: (Math.random() - 0.5) * 0.5,
+                    color: `rgba(255, 215, 0, ${Math.random() * 0.3})`
+                });
+            }
+            
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    
+                    if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+                });
+                
+                requestAnimationFrame(animateParticles);
+            }
+            
+            animateParticles();
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+        
+        // Inicializar tudo quando a página carregar
+        window.addEventListener('load', () => {
+            create3DPieChart();
+            populateSocialList();
+            initParticles();
+        });
+    </script>
+</body>
+</html>
